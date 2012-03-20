@@ -1,6 +1,6 @@
-var exec, fs, querystring, url;
+var answer, answerHtml, answerPlainText, exec, fs, querystring, url;
 
-exec = require('child_process'.exec);
+exec = require('child_process').exec;
 
 fs = require('fs');
 
@@ -8,21 +8,21 @@ url = require('url');
 
 querystring = require('querystring');
 
-answer(function(response, code, mime, content) {
+answer = function(response, code, mime, content) {
   response.writeHead(code, {
     'Content-Type': mime
   });
   response.write(content);
-  return response.end;
-});
+  return response.end();
+};
 
-answerHtml(function(response, code, content) {
+answerHtml = function(response, code, content) {
   return answer(response, code, 'text/html', content);
-});
+};
 
-answerPlainText(function(response, code, content) {
+answerPlainText = function(response, code, content) {
   return answer(response, code, 'text/plain', content);
-});
+};
 
 exports.home = function(request, response, postData) {
   var content;
@@ -68,7 +68,7 @@ exports.show = function(request, response, postData) {
         'Content-Type': 'image/png'
       });
       response.write(file, 'binary');
-      return response.end;
+      return response.end();
     }
   });
 };
@@ -86,6 +86,6 @@ exports.defaultHandler = function(request, response, postData) {
   parsedUrl = url.parse(request.url);
   if (parsedUrl) {
     console.log(parsedUrl);
-    return answerPlainText(response, 200, parsedUrl);
+    return answerPlainText(response, 200, 'Please look at the console to see the output!');
   }
 };

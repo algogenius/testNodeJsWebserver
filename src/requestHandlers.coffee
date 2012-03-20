@@ -1,17 +1,17 @@
-exec = require 'child_process' .exec
+exec = require('child_process').exec
 fs = require 'fs'
 url = require 'url'
 querystring = require 'querystring'
 
-answer (response, code, mime, content) ->
+answer = (response, code, mime, content) ->
   response.writeHead code, {'Content-Type': mime}
   response.write content
-  response.end    
+  response.end()    
 
-answerHtml (response, code, content) ->
+answerHtml = (response, code, content) ->
   answer response, code, 'text/html', content
 
-answerPlainText (response, code, content) ->
+answerPlainText = (response, code, content) ->
   answer response, code, 'text/plain', content
 
 exports.home = (request, response, postData) ->
@@ -55,9 +55,7 @@ exports.start = (request, response, postData) ->
 
 exports.find = (request, response, postData) ->
   console.log 'Handling find.'
-  exec 'find /', 
-  {timeout: 10000, maxBuffer: 20000 * 1024}, 
-  (error, stdout, stderr) ->
+  exec 'find /', {timeout: 10000, maxBuffer: 20000 * 1024}, (error, stdout, stderr) ->
     answerPlainText response, 200, stdout
 
 exports.upload = (request, response, postData) ->
@@ -75,7 +73,7 @@ exports.show = (request, response, postData) ->
     else
       response.writeHead code, {'Content-Type': 'image/png'}
       response.write file, 'binary'
-      response.end          
+      response.end()          
 
 exports.load = (request, response, postData) ->
   console.log 'Handling load.'
@@ -87,4 +85,5 @@ exports.defaultHandler = (request, response, postData) ->
   parsedUrl = url.parse request.url
   if parsedUrl
     console.log parsedUrl
-    answerPlainText response, 200, parsedUrl
+    # answerPlainText response, 200, parsedUrl
+    answerPlainText response, 200, 'Please look at the console to see the output!'

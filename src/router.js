@@ -1,22 +1,21 @@
-var http;
+var url;
 
-http = require('http');
+url = require('url');
 
-exports.run = function(route, handle) {
-  var server;
-  onRequest(function(request, response) {
-    var postData;
-    console.log('Request received.');
-    request.setEncoding('utf-8');
-    postData = '';
-    request.addListener('data', function(dataChunk) {
-      return postData += dataChunk;
+exports.route = function(handle, request, response, postData) {
+  var pathname;
+  pathname = url.parse(request.url).pathname;
+  console.log('About to route a request for "' + pathname + '".');
+  if (pathname.indexOf('..') !== -1) {
+    response.writeHead(403, {
+      'Content-Type': 'text/plain'
     });
-    return request.addListener('end', function() {
-      return route(handle, request, response, postData);
-    });
-  });
-  server = http.createServer(onRequest);
-  server.listen(1380, '127.0.0.1');
-  return console.log('HTTP Server running at 127.0.0.1:1380');
+    response.write('Shit fucking path hacker! Go hack some other site!');
+    response.end();
+  }
+  if (typeof handle[pathname] === 'function') {
+    return handle[pathname](request, response, postData);
+  } else {
+    return handle['defaultHandler'](request, response, postData);
+  }
 };

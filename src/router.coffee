@@ -1,16 +1,15 @@
-http = require 'http'
+url = require 'url'
 
-exports.run = (route, handle) ->
-
-  onRequest (request, response) ->
-    console.log 'Request received.'
-    request.setEncoding 'utf-8'
-    postData = ''      
-    request.addListener 'data', (dataChunk) -> 
-      postData += dataChunk
-    request.addListener 'end', () ->
-      route handle, request, response, postData
+exports.route = (handle, request, response, postData) ->
+  pathname = url.parse(request.url).pathname  
+  console.log 'About to route a request for "' + pathname + '".'
     
-  server = http.createServer(onRequest)
-  server.listen(1380, '127.0.0.1')
-  console.log('HTTP Server running at 127.0.0.1:1380')
+  if pathname.indexOf('..') != -1 
+    response.writeHead 403, {'Content-Type': 'text/plain'}
+    response.write 'Shit fucking path hacker! Go hack some other site!'
+    response.end()
+    
+  if typeof handle[pathname] == 'function'
+    handle[pathname] request, response, postData
+  else
+    handle['defaultHandler'] request, response, postData
